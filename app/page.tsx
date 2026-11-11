@@ -640,12 +640,12 @@ function PaperEdge({ down = false, fill = "#fff" }: { down?: boolean; fill?: str
 }
 
 /** Navy greeting with a compass watermark, a wave edge and a white summary card riding over it. */
-function Hero({ data, logoSrc, chip, total, earned }: { data: Receipt; logoSrc: string; chip: ReactNode; total: number; earned: number }) {
+function Hero({ data, logoSrc, chip, total, earned, feedback }: { data: Receipt; logoSrc: string; chip: ReactNode; total: number; earned: number; feedback?: ReactNode }) {
   const first = data.customer.name.split(" ")[0];
   const size = Math.min(64, Math.max(30, Math.floor(330 / (0.58 * first.length + 0.6))));
   return (
     <header className="relative">
-      <div className="relative overflow-hidden px-5 pb-28 pt-6 text-white" style={{ background: "linear-gradient(180deg,#071B31 0%,#0B2A4A 45%,#13406F 100%)" }}>
+      <div className="relative overflow-hidden px-5 pb-24 pt-6 text-white" style={{ background: "linear-gradient(180deg,#071B31 0%,#0B2A4A 45%,#13406F 100%)" }}>
         <svg aria-hidden="true" viewBox="0 0 200 200" fill="none" stroke="#fff" strokeWidth="1" className="pointer-events-none absolute -right-20 top-8 h-80 w-80 opacity-[0.11]">
           <circle cx="100" cy="100" r="92" />
           <circle cx="100" cy="100" r="70" />
@@ -661,6 +661,7 @@ function Hero({ data, logoSrc, chip, total, earned }: { data: Receipt; logoSrc: 
         <h1 className="nt-display relative mt-1 italic leading-[0.95] [overflow-wrap:anywhere]" style={{ fontSize: size }}>
           {first}
         </h1>
+        <div className="relative mt-6 text-[var(--b-ink)]">{feedback}</div>
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[44px] overflow-hidden">
           <WaveBand fill="rgba(255,255,255,0.22)" className="nt-wave-b bottom-0" height={42} />
           <WaveBand fill="#F4F0E8" className="nt-wave-a bottom-0" height={32} />
@@ -1375,11 +1376,9 @@ function ReceiptView({ data, history, onSelect, qrSrc, barcodeSrc, logoSrc = DEF
 
       <main style={zoomStyle(scale)} className={MAIN_CLASS}>
         {/* 1. Greeting */}
-        <Hero data={data} logoSrc={logoSrc} chip={club ? <TierChip tier={club.tier} /> : null} total={t.total} earned={earned} />
+        <Hero data={data} logoSrc={logoSrc} chip={club ? <TierChip tier={club.tier} /> : null} total={t.total} earned={earned} feedback={<FeedbackBox data={data} onSubmit={onSubmitFeedback} />} />
 
         <div className="space-y-4 px-4 pt-4">
-          {/* 2. Rate your visit: first thing the customer sees */}
-          <FeedbackBox data={data} onSubmit={onSubmitFeedback} />
           {/* 3. Video / banners */}
           <MarketingCarousel />
           {/* 4. Points | Profile | Coupons */}
