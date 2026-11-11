@@ -502,7 +502,7 @@ const ALERT_CARD = "rounded-[26px] bg-[var(--b-soft)] text-[var(--b-ink)]";
 const REFER_CARD = `rounded-[26px] border border-[var(--b-line)] bg-white shadow-[0_16px_34px_-24px_rgba(7,27,49,0.55)] active:bg-[var(--b-wash)] ${FOCUS}`;
 const REFER_CODE = "rounded-full bg-[var(--b-wash)] text-[var(--b-acc)]";
 const REFER_ARROW = "bg-[var(--b-acc)] text-white";
-const PAPER_WRAP = "mx-3 mt-10";
+const PAPER_WRAP = "mx-3 mt-6";
 const PAPER_SHADOW = "drop-shadow(0 14px 14px rgba(7,27,49,0.18))";
 const PAPER_TOP_FILL = "#0B2A4A";
 const PAPER_BODY = "bg-white";
@@ -739,7 +739,7 @@ function StoreShell({ children }: { children: ReactNode }) {
 /** White stub under a navy wave line. */
 function StubShell({ children }: { children: ReactNode }) {
   return (
-    <footer className="relative mt-14" style={{ filter: "drop-shadow(0 -6px 10px rgba(7,27,49,0.12))" }}>
+    <footer className="relative mt-10" style={{ filter: "drop-shadow(0 -6px 10px rgba(7,27,49,0.12))" }}>
       <svg aria-hidden="true" viewBox="0 0 800 40" preserveAspectRatio="none" fill="#fff" className="absolute -top-[21px] left-0 h-[22px] w-full">
         <path d={WAVE_PATH} />
       </svg>
@@ -1274,9 +1274,9 @@ const FEEDBACK_ROWS = [
   { key: "value", label: "Value" },
 ] as const;
 
-function Stars({ value, onChange, size = "h-9 w-9", label }: { value: number; onChange: (n: number) => void; size?: string; label: string }) {
+function Stars({ value, onChange, size = "h-9 w-9", label, spread = false }: { value: number; onChange: (n: number) => void; size?: string; label: string; spread?: boolean }) {
   return (
-    <div role="radiogroup" aria-label={label} className="flex gap-1.5">
+    <div role="radiogroup" aria-label={label} className={spread ? "flex justify-between px-1" : "flex gap-1.5"}>
       {[1, 2, 3, 4, 5].map((n) => (
         <button key={n} type="button" role="radio" aria-checked={value === n} aria-label={`${n} star${n > 1 ? "s" : ""}`} onClick={() => onChange(n)} className={`text-[var(--b-acc)] ${FOCUS}`}>
           <svg viewBox="0 0 24 24" strokeWidth="1.6" strokeLinejoin="round" style={{ animationDelay: `${n * 0.2}s` }} className={`${size} stroke-current ${value === 0 ? "nt-star" : n <= value ? "fill-current" : "fill-transparent"}`}>
@@ -1296,24 +1296,24 @@ function FeedbackBox({ data, onSubmit }: { data: Receipt; onSubmit?: (v: Feedbac
 
   if (done) {
     return (
-      <div className={`${CARD} p-5`} aria-live="polite">
+      <div className={`${CARD} px-5 py-4`} aria-live="polite">
         <span className={`${DISPLAY} block text-[26px] leading-none`}>Thank you</span>
         <p className="mt-2 text-[15px] text-[var(--b-gray)]">Your feedback has been shared with the {data.store.name} team.</p>
       </div>
     );
   }
   return (
-    <div className={`${CARD} p-5`}>
-      <span className={`${DISPLAY} block text-[28px] leading-none`}>Rate your visit</span>
-      <div className="mt-4">
-        <Stars value={overall} onChange={setOverall} label="Overall rating" />
+    <div className={`${CARD} px-5 pb-4 pt-4`}>
+      <div className="flex items-baseline justify-between gap-3">
+        <span className={`${DISPLAY} block text-[22px] leading-none`}>Rate your visit</span>
+        <span className="text-[13px] text-[var(--b-gray)]" aria-live="polite">{overall ? RATING_WORDS[overall - 1] : "Tap a star"}</span>
       </div>
-      <p className="mt-3 text-[15px] leading-snug text-[var(--b-gray)]" aria-live="polite">
-        {overall ? RATING_WORDS[overall - 1] : `Tell us about your shopping experience at ${BRAND}.`}
-      </p>
+      <div className="mt-3.5">
+        <Stars value={overall} onChange={setOverall} label="Overall rating" size="h-10 w-10" spread />
+      </div>
       <Collapse open={overall > 0} id="feedback-more">
         <form
-          className="space-y-4 pt-5"
+          className="space-y-4 pt-4"
           onSubmit={(e) => {
             e.preventDefault();
             onSubmit?.({ invoiceNo: data.invoiceNo, overall, categories: cats, comment });
@@ -1377,10 +1377,12 @@ function ReceiptView({ data, history, onSelect, qrSrc, barcodeSrc, logoSrc = DEF
         {/* 1. Greeting */}
         <Hero data={data} logoSrc={logoSrc} chip={club ? <TierChip tier={club.tier} /> : null} total={t.total} earned={earned} />
 
-        <div className="space-y-7 px-4 pt-7">
-          {/* 2. Video / banners */}
+        <div className="space-y-4 px-4 pt-4">
+          {/* 2. Rate your visit: first thing the customer sees */}
+          <FeedbackBox data={data} onSubmit={onSubmitFeedback} />
+          {/* 3. Video / banners */}
           <MarketingCarousel />
-          {/* 3. Points | Profile | Coupons */}
+          {/* 4. Points | Profile | Coupons */}
           <LoyaltyTabs data={data} earned={earned} onSaveProfile={onSaveProfile} />
         </div>
 
@@ -1464,10 +1466,7 @@ function ReceiptView({ data, history, onSelect, qrSrc, barcodeSrc, logoSrc = DEF
           <PaperEdge down />
         </section>
 
-        <div className="space-y-7 px-4 pt-9">
-          {/* 5. Rate your visit */}
-          <FeedbackBox data={data} onSubmit={onSubmitFeedback} />
-
+        <div className="space-y-4 px-4 pt-5">
           {/* 6. Refer a friend */}
           {referral && (
             <a href={whatsappHref} target="_blank" rel="noopener noreferrer" onClick={() => onRefer?.(referral.code)} className={`${REFER_CARD} group flex items-center justify-between gap-4 p-5`}>
