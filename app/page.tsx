@@ -69,8 +69,6 @@ const FONT_FACES = `
 .nt-root a:active,.nt-root button:not(:disabled):active{transform:scale(.97)}
 
 /* Rating stars flash in a wave until the first tap */
-@keyframes nt-star{0%,10%{fill:transparent}24%,64%{fill:currentColor}80%,100%{fill:transparent}}
-.nt-star{fill:transparent;animation:nt-star 3.2s ease-in-out infinite}
 
 /* Light sweep across the tier card */
 @keyframes nt-sheen{0%,55%{left:-60%}100%{left:130%}}
@@ -82,7 +80,6 @@ const FONT_FACES = `
 .nt-wave-b{animation:nt-drift 26s linear infinite reverse}
 
 @media (prefers-reduced-motion:reduce){
-  .nt-star{animation:none;fill:currentColor}
   .nt-sheen::after{animation:none;display:none}
   .nt-root a,.nt-root button:not(:disabled){transition:none}
   .nt-root a:active,.nt-root button:not(:disabled):active{transform:none}
@@ -1280,7 +1277,7 @@ function Stars({ value, onChange, size = "h-9 w-9", label, spread = false }: { v
     <div role="radiogroup" aria-label={label} className={spread ? "flex justify-between px-1" : "flex gap-1.5"}>
       {[1, 2, 3, 4, 5].map((n) => (
         <button key={n} type="button" role="radio" aria-checked={value === n} aria-label={`${n} star${n > 1 ? "s" : ""}`} onClick={() => onChange(n)} className={`text-[var(--b-acc)] ${FOCUS}`}>
-          <svg viewBox="0 0 24 24" strokeWidth="1.6" strokeLinejoin="round" style={{ animationDelay: `${n * 0.2}s` }} className={`${size} stroke-current ${value === 0 ? "nt-star" : n <= value ? "fill-current" : "fill-transparent"}`}>
+          <svg viewBox="0 0 24 24" strokeWidth="1.6" strokeLinejoin="round" className={`${size} stroke-current ${n <= value ? "fill-current" : "fill-transparent"}`}>
             {PATHS.star}
           </svg>
         </button>
